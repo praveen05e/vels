@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { supabaseAdmin } from '../index';
-import { authenticate } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -60,7 +60,7 @@ router.post('/logout', async (req, res) => {
 
 router.get('/profile', authenticate, async (req, res) => {
   try {
-    const { data, error } = await supabaseAdmin.from('profiles').select('*').eq('id', req.user!.id).single();
+    const { data, error } = await supabaseAdmin.from('profiles').select('*').eq('id', (req as any).user!.id).single();
     if (error) throw error;
     res.json(data);
   } catch (err: any) {
@@ -71,12 +71,12 @@ router.get('/profile', authenticate, async (req, res) => {
 router.put('/profile', authenticate, async (req, res) => {
   try {
     const { full_name, organization_id } = req.body;
-    const { error } = await supabaseAdmin.from('profiles').update({ full_name, organization_id }).eq('id', req.user!.id);
+    const { error } = await supabaseAdmin.from('profiles').update({ full_name, organization_id }).eq('id', (req as any).user!.id);
     if (error) throw error;
     
     await supabaseAdmin.from('audit_logs').insert({
         action: 'update_profile',
-        user_id: req.user!.id,
+        user_id: (req as any).user!.id,
         details: { full_name, organization_id }
     });
     

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabaseAdmin } from '../index';
+import { supabaseAdmin } from '../index.js';
 
 export interface AuthUser {
   id: string;
@@ -42,7 +42,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         return;
     }
     
-    req.user = {
+    (req as any).user = {
       id: user.id,
       email: user.email!,
       role: profile.role,
@@ -58,11 +58,11 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
 
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
+    if (!(req as any).user) {
         res.status(401).json({ error: 'Authentication required' });
         return;
     }
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes((req as any).user.role)) {
         res.status(403).json({ error: 'Insufficient permissions' });
         return;
     }
@@ -72,11 +72,11 @@ export function requireRole(...roles: string[]) {
 
 export function requireOwnerOrRole(resourceUserIdField: string, ...roles: string[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user) {
+        if (!(req as any).user) {
             res.status(401).json({ error: 'Authentication required' });
             return;
         }
-        if (roles.includes(req.user.role)) {
+        if (roles.includes((req as any).user.role)) {
             next();
             return;
         }

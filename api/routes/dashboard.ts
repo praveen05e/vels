@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../index';
-import { authenticate } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);
@@ -11,7 +11,7 @@ router.get('/donor', async (req, res) => {
     const { data: batches, error } = await supabaseAdmin
       .from('food_batches')
       .select('status, available_quantity, total_quantity')
-      .eq('donor_id', req.user!.id);
+      .eq('donor_id', (req as any).user!.id);
       
     if (error) throw error;
     

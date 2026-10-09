@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../index';
-import { authenticate, requireRole } from '../middleware/auth';
-import { runAllocationEngine } from '../services/allocationEngine';
+import { supabaseAdmin } from '../index.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
+import { runAllocationEngine } from '../services/allocationEngine.js';
 
 const router = Router();
 router.use(authenticate);
@@ -12,7 +12,7 @@ router.post('/run', requireRole('coordinator', 'admin'), async (req, res) => {
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'run_allocation_engine',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { result }
     });
     
@@ -39,7 +39,7 @@ router.post('/:id/dispatch', requireRole('coordinator', 'admin'), async (req, re
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'dispatch_allocation',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { allocation_id: req.params.id }
     });
     

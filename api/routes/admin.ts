@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../index';
-import { authenticate, requireRole } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);
@@ -24,7 +24,7 @@ router.put('/users/:id/role', async (req, res) => {
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'update_user_role',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { target_user_id: req.params.id, role }
     });
     

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../index';
-import { authenticate } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);
@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
     const { data, error } = await supabaseAdmin
       .from('notifications')
       .select('*')
-      .eq('user_id', req.user!.id)
+      .eq('user_id', (req as any).user!.id)
       .order('created_at', { ascending: false })
       .limit(50);
       
@@ -27,7 +27,7 @@ router.put('/:id/read', async (req, res) => {
       .from('notifications')
       .update({ read: true })
       .eq('id', req.params.id)
-      .eq('user_id', req.user!.id);
+      .eq('user_id', (req as any).user!.id);
       
     if (error) throw error;
     res.json({ success: true });
@@ -41,7 +41,7 @@ router.put('/read-all', async (req, res) => {
     const { error } = await supabaseAdmin
       .from('notifications')
       .update({ read: true })
-      .eq('user_id', req.user!.id);
+      .eq('user_id', (req as any).user!.id);
       
     if (error) throw error;
     res.json({ success: true });
@@ -55,7 +55,7 @@ router.get('/unread-count', async (req, res) => {
     const { count, error } = await supabaseAdmin
       .from('notifications')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', req.user!.id)
+      .eq('user_id', (req as any).user!.id)
       .eq('read', false);
       
     if (error) throw error;

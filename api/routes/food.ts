@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { supabaseAdmin } from '../index';
-import { authenticate, requireRole } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
 import crypto from 'crypto';
 
 const router = Router();
@@ -25,7 +25,7 @@ router.post('/', requireRole('donor'), async (req, res) => {
 
     const { data: batch, error } = await supabaseAdmin.from('food_batches').insert({
       ...data,
-      donor_id: req.user!.id,
+      donor_id: (req as any).user!.id,
       batch_code,
       available_quantity: data.total_quantity,
       status: 'pending'
@@ -37,12 +37,12 @@ router.post('/', requireRole('donor'), async (req, res) => {
       batch_id: batch.id,
       transaction_type: 'creation',
       quantity: data.total_quantity,
-      user_id: req.user!.id
+      user_id: (req as any).user!.id
     });
 
     await supabaseAdmin.from('audit_logs').insert({
       action: 'create_food_batch',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { batch_id: batch.id }
     });
 
@@ -56,9 +56,9 @@ router.get('/', async (req, res) => {
   try {
     let query = supabaseAdmin.from('food_batches').select('*');
     
-    if (req.user!.role === 'donor') {
-      query = query.eq('donor_id', req.user!.id);
-    } else if (req.user!.role === 'receiver') {
+    if ((req as any).user!.role === 'donor') {
+      query = query.eq('donor_id', (req as any).user!.id);
+    } else if ((req as any).user!.role === 'receiver') {
       query = query.eq('status', 'verified');
     }
 
@@ -84,7 +84,7 @@ router.post('/:id/verify', requireRole('coordinator', 'admin'), async (req, res)
   try {
     const { error } = await supabaseAdmin.from('food_batches').update({
       status: 'verified',
-      verified_by: req.user!.id,
+      verified_by: (req as any).user!.id,
       verified_at: new Date().toISOString()
     }).eq('id', req.params.id);
     
@@ -92,7 +92,7 @@ router.post('/:id/verify', requireRole('coordinator', 'admin'), async (req, res)
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'verify_food_batch',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { batch_id: req.params.id }
     });
     

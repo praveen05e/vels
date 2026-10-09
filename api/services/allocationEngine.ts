@@ -16,11 +16,8 @@
 // 4. Delivery must meet safety & time constraints
 // 5. Infeasible/unsafe routes are NOT dispatched
 // 6. Results are explainable and auditable
-// ============================================================
-
-import solver from 'javascript-lp-solver';
-
-// --- Types ---
+import * as solverLib from 'javascript-lp-solver';
+const solver = (solverLib as any).default || solverLib;
 
 export interface AllocBatch {
   id: string;

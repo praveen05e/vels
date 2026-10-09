@@ -5,16 +5,16 @@ import rateLimit from 'express-rate-limit';
 import { createClient } from '@supabase/supabase-js';
 
 // Import routes
-import authRoutes from './routes/auth';
-import foodRoutes from './routes/food';
-import demandRoutes from './routes/demand';
-import allocationRoutes from './routes/allocation';
-import deliveryRoutes from './routes/delivery';
-import simulationRoutes from './routes/simulation';
-import adminRoutes from './routes/admin';
-import notificationRoutes from './routes/notifications';
-import dashboardRoutes from './routes/dashboard';
-import offlineRoutes from './routes/offline';
+import authRoutes from './routes/auth.js';
+import foodRoutes from './routes/food.js';
+import demandRoutes from './routes/demand.js';
+import allocationRoutes from './routes/allocation.js';
+import deliveryRoutes from './routes/delivery.js';
+import simulationRoutes from './routes/simulation.js';
+import adminRoutes from './routes/admin.js';
+import notificationRoutes from './routes/notifications.js';
+import dashboardRoutes from './routes/dashboard.js';
+import offlineRoutes from './routes/offline.js';
 
 const app = express();
 

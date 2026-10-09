@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../index';
-import { authenticate, requireRole } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);
@@ -19,7 +19,7 @@ router.post('/', requireRole('coordinator', 'admin'), async (req, res) => {
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'create_delivery',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { delivery_id: data.id }
     });
     
@@ -32,8 +32,8 @@ router.post('/', requireRole('coordinator', 'admin'), async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     let query = supabaseAdmin.from('deliveries').select('*');
-    if (req.user!.role === 'driver') {
-      query = query.eq('driver_id', req.user!.id);
+    if ((req as any).user!.role === 'driver') {
+      query = query.eq('driver_id', (req as any).user!.id);
     }
     const { data, error } = await query;
     if (error) throw error;
@@ -61,7 +61,7 @@ router.put('/:id/status', requireRole('driver', 'coordinator', 'admin'), async (
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'update_delivery_status',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { delivery_id: req.params.id, status }
     });
     
@@ -79,7 +79,7 @@ router.post('/:id/confirm', requireRole('receiver'), async (req, res) => {
         
         await supabaseAdmin.from('audit_logs').insert({
             action: 'confirm_delivery',
-            user_id: req.user!.id,
+            user_id: (req as any).user!.id,
             details: { delivery_id: req.params.id, quantity_received }
         });
         
@@ -97,7 +97,7 @@ router.post('/:id/fail', async (req, res) => {
         
         await supabaseAdmin.from('audit_logs').insert({
             action: 'fail_delivery',
-            user_id: req.user!.id,
+            user_id: (req as any).user!.id,
             details: { delivery_id: req.params.id, reason }
         });
         

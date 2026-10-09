@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../index';
-import { authenticate } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);
@@ -37,7 +37,7 @@ router.post('/sync', async (req, res) => {
         // Log it
         await supabaseAdmin.from('offline_sync_logs').insert({
             operation_id: op.operation_id,
-            user_id: req.user!.id,
+            user_id: (req as any).user!.id,
             operation_type: op.operation_type,
             status: 'success'
         });

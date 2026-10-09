@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { supabaseAdmin } from '../index';
-import { authenticate, requireRole } from '../middleware/auth';
+import { supabaseAdmin } from '../index.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 router.use(authenticate);
@@ -21,7 +21,7 @@ router.post('/', requireRole('receiver'), async (req, res) => {
     
     const { data: demand, error } = await supabaseAdmin.from('demands').insert({
       ...data,
-      receiver_id: req.user!.id,
+      receiver_id: (req as any).user!.id,
       status: 'pending',
       quantity_allocated: 0
     }).select().single();
@@ -30,7 +30,7 @@ router.post('/', requireRole('receiver'), async (req, res) => {
 
     await supabaseAdmin.from('audit_logs').insert({
       action: 'create_demand',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { demand_id: demand.id }
     });
 
@@ -43,8 +43,8 @@ router.post('/', requireRole('receiver'), async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     let query = supabaseAdmin.from('demands').select('*');
-    if (req.user!.role === 'receiver') {
-      query = query.eq('receiver_id', req.user!.id);
+    if ((req as any).user!.role === 'receiver') {
+      query = query.eq('receiver_id', (req as any).user!.id);
     }
     const { data, error } = await query;
     if (error) throw error;
@@ -61,7 +61,7 @@ router.post('/:id/approve', requireRole('coordinator', 'admin'), async (req, res
     
     await supabaseAdmin.from('audit_logs').insert({
       action: 'approve_demand',
-      user_id: req.user!.id,
+      user_id: (req as any).user!.id,
       details: { demand_id: req.params.id }
     });
     
